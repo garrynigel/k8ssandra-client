@@ -20,6 +20,9 @@ GO_FLAGS ?= -v
 
 BUILDX_OPTIONS ?=
 
+GOOS ?= linux
+GOARCH ?= amd64
+
 .PHONY: all
 all: test build
 
@@ -61,13 +64,12 @@ lint: golangci-lint ## Run golangci-lint against code
 	$(GOLANGCI_LINT) run ./...
 
 .PHONY: build
-build: ## Build kubectl-k8ssandra
-	CGO_ENABLED=0 go build -o kubectl-k8ssandra cmd/kubectl-k8ssandra/main.go
+build: ## Build kubectl-k8ssandra for linux/amd64
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o kubectl-k8ssandra cmd/kubectl-k8ssandra/main.go
 
 .PHONY: docker-build
-docker-build: ## Build k8ssandra-client docker image
-	mkdir -p build/
-	docker buildx build --build-arg VERSION=${VERSION} -t ${IMG} ${BUILDX_OPTIONS} . --load -f cmd/kubectl-k8ssandra/Dockerfile
+docker-build: build ## Build k8ssandra-client docker image (requires pre-built binary)
+	docker build --no-cache --platform=linux/amd64 --build-arg VERSION=${VERSION} -t ${IMG} ${BUILDX_OPTIONS} -f cmd/kubectl-k8ssandra/Dockerfile .
 
 .PHONY: kind-load
 kind-load: ## Load k8ssandra-client:latest to kind
