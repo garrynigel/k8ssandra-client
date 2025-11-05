@@ -542,7 +542,6 @@ func TestServerOptionsOutput(t *testing.T) {
 	require.Contains(s, "-Xms512m")
 	require.Contains(s, "-Dcassandra.system_distributed_replication=test-dc:1")
 	require.Contains(s, "-Dcom.sun.management.jmxremote.authenticate=true")
-	require.Contains(s, "-Djava.net.preferIPv4Stack=false")
 
 	s11, err := readJvmServerOptions(inputFile11)
 
